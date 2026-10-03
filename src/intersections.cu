@@ -1,7 +1,9 @@
 #include "intersections.h"
 
+#include <cfloat>
+
 __host__ __device__ float boxIntersectionTest(
-    Geom box,
+    const Geom& box,
     Ray r,
     glm::vec3 &intersectionPoint,
     glm::vec3 &normal,
@@ -57,7 +59,7 @@ __host__ __device__ float boxIntersectionTest(
 }
 
 __host__ __device__ float sphereIntersectionTest(
-    Geom sphere,
+    const Geom& sphere,
     Ray r,
     glm::vec3 &intersectionPoint,
     glm::vec3 &normal,
@@ -65,6 +67,7 @@ __host__ __device__ float sphereIntersectionTest(
 {
     float radius = .5;
 
+    // inverse transform the ray into object space
     glm::vec3 ro = multiplyMV(sphere.inverseTransform, glm::vec4(r.origin, 1.0f));
     glm::vec3 rd = glm::normalize(multiplyMV(sphere.inverseTransform, glm::vec4(r.direction, 0.0f)));
 
@@ -108,6 +111,118 @@ __host__ __device__ float sphereIntersectionTest(
     {
         normal = -normal;
     }
+
+    return glm::length(r.origin - intersectionPoint);
+}
+
+__host__ __device__ float triangleIntersectionTest(
+    const Triangle& tri,
+    Ray r,
+    float& u,
+    float& v)
+{
+    // everything happens in object space
+
+    // glm's implementation of Möller-Trumbore is one-sided (false if a < epsilon). 
+    // either we can copy the algo and edit, or (for now) just keep the meshes with a diffuse color so we don't need to worry about this
+    glm::vec3 bary;
+    float t;
+    if (!glm::intersectRayTriangle(r.origin, r.direction, tri.v0, tri.v1, tri.v2, bary))  // calculates the face normal itself, does not know about our stored vertex normals
+    {
+        return -1;
+    }
+
+    // intersectRayTriangle returns barycentric coordinates, t 
+    u = bary.x;
+    v = bary.y;
+    t = bary.z > 0.0f ? bary.z : -1;  // packed in
+    return t;
+}
+
+__host__ __device__ bool aabbIntersectionTest(
+    glm::vec3 bboxMin,
+    glm::vec3 bboxMax,
+    Ray r)
+{
+    // everything happens in object space
+
+    // slab test, same idea as boxIntersectionTest: does the ray pass through this bbox?
+    // inside the box = inside all 3 slabs at once, after the last entry and before the first exit
+    float tNear = -FLT_MAX;
+    float tFar = FLT_MAX;
+    for (int xyz = 0; xyz < 3; ++xyz)
+    {
+        // for all x,y,z in parallel, find t_min and t_max s.t. ray.origin + t * ray.direction = (x,y,z)_(min,max).
+        float t1 = (bboxMin[xyz] - r.origin[xyz]) / r.direction[xyz];
+        float t2 = (bboxMax[xyz] - r.origin[xyz]) / r.direction[xyz];
+
+        // same per axis, where the ray enters and leaves that slab
+        tNear = glm::max(tNear, glm::min(t1, t2));
+        tFar = glm::min(tFar, glm::max(t1, t2));
+
+        // intervals already stopped overlapping, no need to check the other axes
+        if (tNear > tFar)
+        {
+            return false;
+        }
+    }
+
+    // does nay overlap between the three intervals exist? (and is that overlap ahead of the ray)
+    return tFar > 0.0f;
+}
+
+__host__ __device__ float meshIntersectionTest(
+    const Geom& mesh,
+    Ray r,
+    const Triangle* triangles,
+    bool bboxCulling,
+    glm::vec3& intersectionPoint,
+    glm::vec3& normal,
+    bool& outside)
+{
+    // move ray into object space, same as box/sphere
+    Ray q;
+    q.origin    =                multiplyMV(mesh.inverseTransform, glm::vec4(r.origin   , 1.0f));
+    q.direction = glm::normalize(multiplyMV(mesh.inverseTransform, glm::vec4(r.direction, 0.0f)));
+
+    // ray doesn't even go inside the bbox
+    if (bboxCulling && !aabbIntersectionTest(mesh.bboxMin, mesh.bboxMax, q))
+    {
+        return -1;
+    }
+
+    float tMin = FLT_MAX;
+    float closestU = 0.0f;
+    float closestV = 0.0f;
+    int closestTri = -1;
+    // we'll loop through all of the triangles for this mesh
+    for (int i = mesh.triStart; i < mesh.triStart + mesh.triCount; i++)
+    {
+        float u, v;
+        float t = triangleIntersectionTest(triangles[i], q, u, v);
+        if (t > 0.0f && t < tMin)
+        {
+            tMin = t;
+            closestU = u;
+            closestV = v;
+            closestTri = i;
+        }
+    }
+
+    // ray does go inside the bbox but missed every triangle on the actual mesh
+    if (closestTri == -1)
+    {
+        return -1;
+    }
+
+    // blend the vertex normals with the barycentric coordinates we received to get the smooth normal
+    const Triangle& tri = triangles[closestTri];
+    glm::vec3 objNormal = (1.0f - closestU - closestV) * tri.n0 + closestU * tri.n1 + closestV * tri.n2;
+
+    // back to world space
+    intersectionPoint = multiplyMV(mesh.transform, glm::vec4(getPointOnRay(q, tMin), 1.0f));
+    normal = glm::normalize(multiplyMV(mesh.invTranspose, glm::vec4(objNormal, 0.0f)));
+    outside = true;  // triangleIntersectionTest only ever hits front faces
 
     return glm::length(r.origin - intersectionPoint);
 }

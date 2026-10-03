@@ -57,11 +57,13 @@ set(headers
     src/scene.h
     src/sceneStructs.h
     src/utilities.h
+    src/compaction.h
 )
 
 set(sources
     src/main.cpp
     src/stb.cpp
+    src/tinyobj.cpp
     src/image.cpp
     src/glslUtility.cpp
     src/pathtrace.cu
@@ -69,6 +71,7 @@ set(sources
     src/interactions.cu
     src/scene.cpp
     src/utilities.cpp
+    src/compaction.cu
 )
 
 set(imgui_headers

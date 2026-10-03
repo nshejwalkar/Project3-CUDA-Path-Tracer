@@ -49,7 +49,7 @@ __host__ __device__ inline glm::vec3 multiplyMV(glm::mat4 m, glm::vec4 v)
  * @return                   Ray parameter `t` value. -1 if no intersection.
  */
 __host__ __device__ float boxIntersectionTest(
-    Geom box,
+    const Geom& box,
     Ray r,
     glm::vec3& intersectionPoint,
     glm::vec3& normal,
@@ -66,8 +66,28 @@ __host__ __device__ float boxIntersectionTest(
  * @return                   Ray parameter `t` value. -1 if no intersection.
  */
 __host__ __device__ float sphereIntersectionTest(
-    Geom sphere,
+    const Geom& sphere,
     Ray r,
+    glm::vec3& intersectionPoint,
+    glm::vec3& normal,
+    bool& outside);
+
+__host__ __device__ float triangleIntersectionTest(
+    const Triangle& tri,
+    Ray r,
+    float& u,
+    float& v);
+
+__host__ __device__ bool aabbIntersectionTest(
+    glm::vec3 bboxMin,
+    glm::vec3 bboxMax,
+    Ray r);
+
+__host__ __device__ float meshIntersectionTest(
+    const Geom& mesh,
+    Ray r,
+    const Triangle* triangles,
+    bool bboxCulling,
     glm::vec3& intersectionPoint,
     glm::vec3& normal,
     bool& outside);

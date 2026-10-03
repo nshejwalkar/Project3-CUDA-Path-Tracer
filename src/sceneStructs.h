@@ -12,7 +12,15 @@
 enum GeomType
 {
     SPHERE,
-    CUBE
+    CUBE,
+    MESH
+};
+
+// one entry in the global triangle array. object space
+struct Triangle
+{
+    glm::vec3 v0, v1, v2;
+    glm::vec3 n0, n1, n2;  // per vertex normals that will be blended later
 };
 
 struct Ray
@@ -31,6 +39,12 @@ struct Geom
     glm::mat4 transform;
     glm::mat4 inverseTransform;
     glm::mat4 invTranspose;
+
+    // mesh only: range in the global triangle array + object space bounding box (can be defined by two verts)
+    int triStart;
+    int triCount;
+    glm::vec3 bboxMin;
+    glm::vec3 bboxMax;
 };
 
 struct Material
@@ -57,6 +71,8 @@ struct Camera
     glm::vec3 right;
     glm::vec2 fov;
     glm::vec2 pixelLength;
+    float lensRadius;     // determines the depth of field. 0 = pinhole
+    float focalDistance;  // distance to the plane that's in focus. this is d_o in the thin lens equation, NOT the focal length f
 };
 
 struct RenderState
@@ -84,4 +100,5 @@ struct ShadeableIntersection
   float t;
   glm::vec3 surfaceNormal;
   int materialId;
+  bool outside;  // needed for refraction. hit could be from the outside->in or inside->out
 };
