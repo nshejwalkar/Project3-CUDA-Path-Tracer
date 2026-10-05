@@ -1,0 +1,362 @@
+{
+    "Materials": {
+        "floor": {
+            "TYPE": "Diffuse",
+            "RGB": [
+                0.72,
+                0.68,
+                0.62
+            ]
+        },
+        "backdrop": {
+            "TYPE": "Diffuse",
+            "RGB": [
+                0.22,
+                0.36,
+                0.42
+            ]
+        },
+        "key": {
+            "TYPE": "Emitting",
+            "RGB": [
+                1.0,
+                0.92,
+                0.8
+            ],
+            "EMITTANCE": 14
+        },
+        "fill": {
+            "TYPE": "Emitting",
+            "RGB": [
+                0.55,
+                0.7,
+                1.0
+            ],
+            "EMITTANCE": 3
+        },
+        "accent": {
+            "TYPE": "Emitting",
+            "RGB": [
+                1.0,
+                0.45,
+                0.15
+            ],
+            "EMITTANCE": 12
+        },
+        "glass": {
+            "TYPE": "Refractive",
+            "RGB": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "IOR": 1.5
+        },
+        "glass_tint": {
+            "TYPE": "Refractive",
+            "RGB": [
+                0.75,
+                0.9,
+                1.0
+            ],
+            "IOR": 1.5
+        },
+        "mirror": {
+            "TYPE": "Specular",
+            "RGB": [
+                0.95,
+                0.95,
+                0.95
+            ]
+        },
+        "hero": {
+            "TYPE": "Diffuse",
+            "RGB": [
+                0.82,
+                0.62,
+                0.38
+            ]
+        },
+        "white": {
+            "TYPE": "Diffuse",
+            "RGB": [
+                0.9,
+                0.9,
+                0.9
+            ]
+        },
+        "glass_blue": {
+            "TYPE": "Refractive",
+            "RGB": [
+                0.55,
+                0.75,
+                1.0
+            ],
+            "IOR": 1.5
+        },
+        "glass_amber": {
+            "TYPE": "Refractive",
+            "RGB": [
+                1.0,
+                0.7,
+                0.35
+            ],
+            "IOR": 1.5
+        },
+        "glass_rose": {
+            "TYPE": "Refractive",
+            "RGB": [
+                1.0,
+                0.55,
+                0.7
+            ],
+            "IOR": 1.5
+        },
+        "glass_green": {
+            "TYPE": "Refractive",
+            "RGB": [
+                0.55,
+                1.0,
+                0.65
+            ],
+            "IOR": 1.5
+        },
+        "gold": {
+            "TYPE": "Specular",
+            "RGB": [
+                1.0,
+                0.78,
+                0.4
+            ]
+        },
+        "accent_pink": {
+            "TYPE": "Emitting",
+            "RGB": [
+                1.0,
+                0.3,
+                0.7
+            ],
+            "EMITTANCE": 12
+        }
+    },
+    "Camera": {
+        "RES": [
+            1920,
+            1080
+        ],
+        "FOVY": 17.0,
+        "ITERATIONS": 2000,
+        "DEPTH": 8,
+        "FILE": "nefertiti",
+        "EYE": [
+            0.0,
+            5.5,
+            14.0
+        ],
+        "LOOKAT": [
+            0.0,
+            1.4,
+            0.0
+        ],
+        "UP": [
+            0.0,
+            1.0,
+            0.0
+        ],
+        "APERTURE": 0.12,
+        "FOCAL_DIST": 14.082113822241018
+    },
+    "Objects": [
+        {
+            "TYPE": "cube",
+            "MATERIAL": "floor",
+            "TRANS": [
+                0,
+                -0.05,
+                0
+            ],
+            "ROTAT": [
+                0,
+                0,
+                0
+            ],
+            "SCALE": [
+                60,
+                0.1,
+                60
+            ]
+        },
+        {
+            "TYPE": "cube",
+            "MATERIAL": "backdrop",
+            "TRANS": [
+                0,
+                10,
+                -9
+            ],
+            "ROTAT": [
+                0,
+                0,
+                0
+            ],
+            "SCALE": [
+                60,
+                20,
+                0.1
+            ]
+        },
+        {
+            "TYPE": "cube",
+            "MATERIAL": "key",
+            "TRANS": [
+                2,
+                12,
+                6
+            ],
+            "ROTAT": [
+                -20,
+                0,
+                8
+            ],
+            "SCALE": [
+                10,
+                0.2,
+                8
+            ]
+        },
+        {
+            "TYPE": "cube",
+            "MATERIAL": "fill",
+            "TRANS": [
+                -12,
+                4,
+                6
+            ],
+            "ROTAT": [
+                0,
+                0,
+                0
+            ],
+            "SCALE": [
+                0.2,
+                6,
+                8
+            ]
+        },
+        {
+            "TYPE": "sphere",
+            "MATERIAL": "accent",
+            "TRANS": [
+                -4.5,
+                0.4,
+                -3.5
+            ],
+            "ROTAT": [
+                0,
+                0,
+                0
+            ],
+            "SCALE": [
+                0.8,
+                0.8,
+                0.8
+            ]
+        },
+        {
+            "TYPE": "sphere",
+            "MATERIAL": "accent",
+            "TRANS": [
+                5.5,
+                0.3,
+                -4.5
+            ],
+            "ROTAT": [
+                0,
+                0,
+                0
+            ],
+            "SCALE": [
+                0.6,
+                0.6,
+                0.6
+            ]
+        },
+        {
+            "TYPE": "sphere",
+            "MATERIAL": "glass",
+            "TRANS": [
+                -2.8,
+                1.25,
+                1.8
+            ],
+            "ROTAT": [
+                0,
+                0,
+                0
+            ],
+            "SCALE": [
+                2.5,
+                2.5,
+                2.5
+            ]
+        },
+        {
+            "TYPE": "sphere",
+            "MATERIAL": "mirror",
+            "TRANS": [
+                3.3,
+                1.6,
+                -1.2
+            ],
+            "ROTAT": [
+                0,
+                0,
+                0
+            ],
+            "SCALE": [
+                3.2,
+                3.2,
+                3.2
+            ]
+        },
+        {
+            "TYPE": "sphere",
+            "MATERIAL": "glass_tint",
+            "TRANS": [
+                1.6,
+                0.55,
+                2.8
+            ],
+            "ROTAT": [
+                0,
+                0,
+                0
+            ],
+            "SCALE": [
+                1.1,
+                1.1,
+                1.1
+            ]
+        },
+        {
+            "TYPE": "mesh",
+            "MATERIAL": "hero",
+            "TRANS": [
+                0,
+                2.5,
+                0
+            ],
+            "ROTAT": [
+                -90,
+                0,
+                30
+            ],
+            "SCALE": [
+                5,
+                5,
+                5
+            ],
+            "FILE": "models/nefertiti.obj"
+        }
+    ]
+}
