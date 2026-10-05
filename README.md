@@ -6,6 +6,8 @@ Project 3 - CUDA Path Tracer**
 
 * Neel Shejwalkar
   * [LinkedIn](https://www.linkedin.com/in/neel-shejwalkar/), [twitter](https://x.com/neelshej)
+* Tested on: Ubuntu 24.04, AMD Ryzen 9 9950X 16-Core @ 4.3GHz 64GB, RTX 5080 (GB203, sm_120) 16GB, CUDA 13.0, driver 595.84 (friend's workstation, over SSH)
+
 
 ![70 glass, chrome, and gold spheres, 2560x1440, 5000 spp](img/renders/moshpit_1440p.jpg)
 
@@ -52,11 +54,11 @@ Further work here includes adapting the triangle intersection test (currently gl
 
 ### Depth of Field
 
-| Pinhole (APERTURE 0) | Focused on the sphere | Focused on the back wall |
+| Pinhole (APERTURE 0) | Focused on the near sphere | Focused on the far sphere |
 |:---:|:---:|:---:|
-| ![](img/features/dof_aperture0.jpg) | ![](img/features/dof_focus_sphere.jpg) | ![](img/features/dof_focus_backwall.jpg) |
+| ![](img/features/dof_pinhole.jpg) | ![](img/features/dof_focus_near.jpg) | ![](img/features/dof_focus_far.jpg) |
 
-*APERTURE 0.3, FOCAL_DIST 11.5 (sphere) vs 15.5 (back wall)*
+*APERTURE 1.0, FOCAL_DIST 6.5 (near) vs 13.9 (far), 2000 spp, `scenes/cornell_dof_spheres.json`*
 
 ![](img/charts/dof_cost.png)
 
@@ -190,3 +192,18 @@ In terms of compaction, in an open box it makes intersection faster, but costs t
 * Spot: [Keenan Crane](https://www.cs.cmu.edu/~kmcrane/Projects/ModelRepository/#spot), from *Robust Fairing via Conformal Curvature Flow* (Crane, Pinkall, Schröder 2013)
 * XYZ RGB Dragon: [Stanford 3D Scanning Repository](http://graphics.stanford.edu/data/3Dscanrep/), courtesy of the Stanford Computer Graphics Laboratory (scanned with an XYZ RGB auto-synchronized camera)
 * Bust of Nefertiti: Egyptian Museum and Papyrus Collection, Berlin, scan released through [Cosmo Wenman's FOIA request](https://www.thingiverse.com/thing:3974391), [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/). Renders of it here are shared under the same license.
+
+### Specs
+| | |
+|---|---|
+| SMs | 84 |
+| CUDA cores | 128/SM = 10,752 total |
+| Max threads / SM | 1536 (48 warps) |
+| Max blocks / SM | 24 |
+| L2 cache | 64 MB |
+| Shared memory | 100 KB/SM, 48 KB/block |
+| Registers | 65,536 per SM |
+| Memory bus | 256-bit GDDR7 @ 15001 MHz = 960 GB/s |
+| VRAM | 16 GB |
+| SM clock (max) | 3090 MHz |
+| Peak FP32 | 66,447 GFLOP/s |

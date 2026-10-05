@@ -17,6 +17,7 @@
 #include <cuda_runtime.h>
 #include <cuda_gl_interop.h>
 
+#include <chrono>
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
@@ -45,6 +46,8 @@ Scene* scene;
 GuiDataContainer* guiData;
 RenderState* renderState;
 int iteration;
+bool headless = false;  // --headless: no window/GL, render ITERATIONS, save the png, exit
+std::chrono::high_resolution_clock::time_point headlessStart;
 
 int width;
 int height;
@@ -344,11 +347,12 @@ int main(int argc, char** argv)
 
     if (argc < 2)
     {
-        printf("Usage: %s SCENEFILE.json\n", argv[0]);
+        printf("Usage: %s SCENEFILE.json [--headless]\n", argv[0]);
         return 1;
     }
 
     const char* sceneFile = argv[1];
+    headless = argc > 2 && std::string(argv[2]) == "--headless";
 
     // Load scene file, including meshes
     scene = new Scene(sceneFile);
@@ -372,12 +376,25 @@ int main(int argc, char** argv)
 
     // compute phi (horizontal) and theta (vertical) relative 3D axis
     // so, (0 0 1) is forward, (0 1 0) is up
-    glm::vec3 viewXZ = glm::vec3(view.x, 0.0f, view.z);
-    glm::vec3 viewZY = glm::vec3(0.0f, view.y, view.z);
-    phi = glm::acos(glm::dot(glm::normalize(viewXZ), glm::vec3(0, 0, -1)));
-    theta = glm::acos(glm::dot(glm::normalize(viewZY), glm::vec3(0, 1, 0)));
+    // runCuda rebuilds the camera as lookAt + zoom * (sin(phi)sin(theta), cos(theta), cos(phi)sin(theta)),
+    // so the angles have to come from the direction lookAt -> eye (= -view). the old version used the view
+    // itself, which put cameras that look down below their target (and mirrored x since acos drops the sign)
+    glm::vec3 p = -glm::normalize(view);
+    phi = glm::atan(p.x, p.z);
+    theta = glm::acos(glm::clamp(p.y, -1.0f, 1.0f));
     ogLookAt = cam.lookAt;
     zoom = glm::length(cam.position - ogLookAt);
+
+    if (headless)
+    {
+        // runCuda saves the image and exits once it hits ITERATIONS
+        InitDataContainer(guiData);
+        headlessStart = std::chrono::high_resolution_clock::now();
+        while (true)
+        {
+            runCuda();
+        }
+    }
 
     // Initialize CUDA and GL components
     init();
@@ -455,17 +472,23 @@ void runCuda()
     {
         uchar4* pbo_dptr = NULL;
         iteration++;
-        cudaGLMapBufferObject((void**)&pbo_dptr, pbo);
+        if (!headless) cudaGLMapBufferObject((void**)&pbo_dptr, pbo);
 
         // execute the kernel
         int frame = 0;
         pathtrace(pbo_dptr, frame, iteration);
 
         // unmap buffer object
-        cudaGLUnmapBufferObject(pbo);
+        if (!headless) cudaGLUnmapBufferObject(pbo);
     }
     else
     {
+        if (headless)
+        {
+            cudaDeviceSynchronize();
+            double ms = std::chrono::duration<double, std::milli>(std::chrono::high_resolution_clock::now() - headlessStart).count();
+            printf("headless: %d iterations in %.1f ms (%.3f ms/iter)\n", iteration, ms, ms / iteration);
+        }
         saveImage();
         pathtraceFree();
         cudaDeviceReset();
