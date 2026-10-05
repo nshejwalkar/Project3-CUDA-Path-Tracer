@@ -6,7 +6,7 @@ Project 3 - CUDA Path Tracer**
 
 * Neel Shejwalkar
   * [LinkedIn](https://www.linkedin.com/in/neel-shejwalkar/), [twitter](https://x.com/neelshej)
-* Tested on: Ubuntu 24.04, AMD Ryzen 9 9950X 16-Core @ 4.3GHz 64GB, RTX 5080 (GB203, sm_120) 16GB, CUDA 13.0, driver 595.84 (friend's workstation, over SSH)
+* Tested on: Ubuntu 24.04, AMD Ryzen 9 9950X 16-Core @ 4.3GHz 64GB, RTX 5080 (GB203, sm_120) 16GB, CUDA 13.0, driver 595.84
 
 
 ![70 glass, chrome, and gold spheres, 2560x1440, 5000 spp](img/renders/moshpit_1440p.jpg)
